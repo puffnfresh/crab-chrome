@@ -1,0 +1,29 @@
+{
+    "name": "Crab",
+    "version": "0.1",
+    "manifest_version": 2,
+
+    "description": "Remote browser control via WebSockets.",
+
+    "browser_action": {
+        "default_icon": "crab-off38.png",
+        "default_popup": "popup.html"
+    },
+
+    "icons": {
+        "48": "crab48.png",
+        "128": "crab128.png"
+    },
+
+    "background": {
+        "scripts": ["crab.js"]
+    },
+
+    "options_page": "options.htm",
+
+    "content_security_policy": "script-src 'self'; object-src 'self'",
+    "permissions": [
+        "tabs",
+        "<all_urls>"
+    ]
+}
