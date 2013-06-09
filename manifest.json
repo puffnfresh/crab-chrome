@@ -10,6 +10,14 @@
         "default_popup": "popup.html"
     },
 
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["link-hints.js"],
+            "css": ["link-hints.css"]
+        }
+    ],
+
     "icons": {
         "48": "crab48.png",
         "128": "crab128.png"

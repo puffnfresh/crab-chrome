@@ -8,6 +8,62 @@
         });
     }
 
+    function currentTabId(cb) {
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        }, function(results) {
+            if(!results.length)
+                return;
+
+            cb(results[0].id);
+        });
+    }
+
+    function evaluate(js) {
+        chrome.tabs.executeScript(null, {
+            code: js
+        }, function(results) {
+            results.forEach(function(result) {
+                socket.send(JSON.stringify({
+                    cmd: "result",
+                    value: result
+                }));
+            });
+        });
+    }
+
+    function openTab(url) {
+        chrome.tabs.create({
+            url: url
+        });
+    }
+
+    function showLinkHints() {
+        currentTabId(function(id) {
+            chrome.tabs.sendMessage(id, {
+                cmd: "show-link-hints"
+            });
+        });
+    }
+
+    function hideLinkHints() {
+        currentTabId(function(id) {
+            chrome.tabs.sendMessage(id, {
+                cmd: "hide-link-hints"
+            });
+        });
+    }
+
+    function clickLinkHint(index) {
+        currentTabId(function(id) {
+            chrome.tabs.sendMessage(id, {
+                cmd: "click-link-hint",
+                index: index
+            });
+        });
+    }
+
     global.connect = function() {
         socket = new WebSocket(server);
 
@@ -26,21 +82,20 @@
 
             switch(data.cmd) {
             case "eval":
-                chrome.tabs.executeScript(null, {
-                    code: data.code
-                }, function(results) {
-                    results.forEach(function(result) {
-                        socket.send(JSON.stringify({
-                            cmd: "result",
-                            value: result
-                        }));
-                    });
-                });
+                evaluate(data.code);
                 break;
             case "open-tab":
-                chrome.tabs.create({
-                    url: data.url
-                });
+                openTab(data.url);
+                break;
+            case "show-link-hints":
+                showLinkHints();
+                break;
+            case "hide-link-hints":
+                hideLinkHints();
+                break;
+            case "click-link-hint":
+                clickLinkHint(data.index);
+                break;
             default:
                 throw new Error("Unrecognised command: " + data.cmd);
             }
