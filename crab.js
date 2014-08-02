@@ -20,6 +20,18 @@
         });
     }
 
+    function currentTab(cb) {
+        chrome.tabs.query({
+            active: true,
+            currentWindow: true
+        }, function(results) {
+            if(!results.length)
+                return;
+
+            cb(results[0]);
+        });
+    }
+
     function evaluate(js) {
         chrome.tabs.executeScript(null, {
             code: js
@@ -64,6 +76,30 @@
         });
     }
 
+    function moveTab(amount) {
+        currentTab(function(tab) {
+            var targetIndex = tab.index + amount;
+            chrome.tabs.query({currentWindow: true}, function (tabs) {
+                // handle wraparound
+                var toIndex;
+                if (targetIndex===-1) {
+                    toIndex = tabs.length-1;
+                } else if (targetIndex >= tabs.length) {
+                    toIndex = 0;
+                } else {
+                    toIndex = targetIndex;
+                }
+                chrome.tabs.update(tabs[toIndex].id, {selected: true});
+            });
+        });
+    }
+
+    function closeTab() {
+        currentTabId(function(id) {
+            chrome.tabs.remove(id);
+        });
+    }
+
     global.connect = function() {
         socket = new WebSocket(server);
 
@@ -86,6 +122,15 @@
                 break;
             case "open-tab":
                 openTab(data.url);
+                break;
+            case "next-tab":
+                moveTab(1);
+                break;
+            case "prev-tab":
+                moveTab(-1);
+                break;
+            case "close-tab":
+                closeTab();
                 break;
             case "show-link-hints":
                 showLinkHints();

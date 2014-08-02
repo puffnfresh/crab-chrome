@@ -43,7 +43,7 @@
                     rect.left > -1 &&
                     rect.left < window.innerWidth - 4;
             });
-        })
+        });
 
         visible = zip(links, rects).filter(function(t) {
             return t._2;
