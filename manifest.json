@@ -6,8 +6,7 @@
     "description": "Remote browser control via WebSockets.",
 
     "browser_action": {
-        "default_icon": "crab-off38.png",
-        "default_popup": "popup.html"
+        "default_icon": "crab-off38.png"
     },
 
     "content_scripts": [
