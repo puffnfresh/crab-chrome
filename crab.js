@@ -1,8 +1,10 @@
 (function(global) {
     var server = localStorage['server'] || 'ws://localhost:2722/',
+        connected = false,
         socket;
 
     function icon(state) {
+        connected = state;
         chrome.browserAction.setIcon({
             path: 'crab-' + (state ? 'on' : 'off') + '38.png'
         });
@@ -100,7 +102,7 @@
         });
     }
 
-    global.connect = function() {
+    connect = function() {
         socket = new WebSocket(server);
 
         socket.onopen = function() {
@@ -147,8 +149,17 @@
         };
     };
 
-    global.disconnect = function() {
+    disconnect = function() {
         socket.close();
         icon(false);
     };
+
+    chrome.browserAction.onClicked.addListener(function() {
+        if (connected) {
+            disconnect();
+        } else {
+            connect();
+        }
+    });
+
 })(this);
